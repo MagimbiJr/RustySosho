@@ -6,12 +6,4 @@ import dev.rustybite.rustysosho.BuildConfig
 object RustyConstants {
     const val RUSTY_SOSHO_BASE_URL = "https://yndbirwnmipkoasmlwdn.supabase.co"
     const val API_KEY = BuildConfig.apiKey
-
-}
-
-class Sample {
-    val jsonObject = JsonObject()
-    init {
-        jsonObject.addProperty("phone", "+255718383894")
-    }
 }

@@ -2,8 +2,9 @@ package dev.rustybite.rustysosho.data.dto.auth
 
 
 import com.google.gson.annotations.SerializedName
+import dev.rustybite.rustysosho.domain.model.VerifyResponse
 
-data class VerifiedResponse(
+data class VerifiedResponseDto(
     @SerializedName("access_token")
     val accessToken: String,
     @SerializedName("expires_at")
@@ -17,3 +18,11 @@ data class VerifiedResponse(
     @SerializedName("user")
     val user: VerifiedUserResponse
 )
+
+fun VerifiedResponseDto.toVerifyResponse(): VerifyResponse =
+    VerifyResponse(
+        accessToken = accessToken,
+        expiresAt = expiresAt,
+        refreshToken = refreshToken,
+        user = user
+    )

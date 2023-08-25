@@ -1,11 +1,11 @@
 package dev.rustybite.rustysosho.data.repository
 
-import dev.rustybite.rustysosho.data.dto.auth.AuthResponse
-import dev.rustybite.rustysosho.data.dto.auth.VerifiedResponse
-import org.json.JSONObject
+import com.google.gson.JsonObject
+import dev.rustybite.rustysosho.data.dto.auth.AuthResponseDto
+import dev.rustybite.rustysosho.data.dto.auth.VerifiedResponseDto
 
 interface AuthRepository {
-    suspend fun authenticate(data: JSONObject): AuthResponse
+    suspend fun authenticate(data: JsonObject): AuthResponseDto
 
-    suspend fun verifyNumber(data: JSONObject): VerifiedResponse
+    suspend fun verifyNumber(data: JsonObject): VerifiedResponseDto
 }

@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.rustybite.rustysosho.data.remote.RustySoshoService
+import dev.rustybite.rustysosho.domain.repository.AuthRepositoryImpl
 import dev.rustybite.rustysosho.util.RustyConstants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -21,5 +22,11 @@ object RustyModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(RustySoshoService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAuthRepository(service: RustySoshoService): AuthRepositoryImpl {
+        return AuthRepositoryImpl(service)
     }
 }
