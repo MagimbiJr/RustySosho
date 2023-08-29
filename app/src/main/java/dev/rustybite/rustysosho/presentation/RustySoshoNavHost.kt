@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import dev.rustybite.rustysosho.R
 import dev.rustybite.rustysosho.presentation.authentication.EnterNumberScreen
+import dev.rustybite.rustysosho.presentation.authentication.SelectCountryCodeScreen
 import dev.rustybite.rustysosho.presentation.ui.components.RSBottomNavBar
 import dev.rustybite.rustysosho.util.BottomNavItem
 
@@ -59,7 +60,7 @@ fun RustySoshoNavHost(
             startDestination = "enter_phone_screen",
             modifier = modifier
                 .padding(paddingValues)
-            ) {
+        ) {
             composable(home.route) {
 
             }
@@ -73,7 +74,35 @@ fun RustySoshoNavHost(
 
             }
             composable("enter_phone_screen") {
-                EnterNumberScreen(onNavigate = {}, scrollState = scrollState)
+                EnterNumberScreen(
+                    onNavigate = { event ->
+                        navHostController.navigate(event.route) {
+                            popUpTo(event.route) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    scrollState = scrollState
+                )
+            }
+            composable("code_selection_screen") {
+                SelectCountryCodeScreen(
+                    onNavigate = { event ->
+                        navHostController.navigate(event.route) {
+                            popUpTo(event.route) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onPopBackClicked = { navHostController.popBackStack() }
+                )
+            }
+            composable("search_code_screen") {
+
             }
         }
 

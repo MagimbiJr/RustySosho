@@ -134,4 +134,16 @@ class AuthViewModel @Inject constructor(
             _appEvents.send(AppEvents.Navigating("code_selection_screen"))
         }
     }
+
+    fun onPopBackFromSelectCode() {
+        viewModelScope.launch {
+            _appEvents.send(AppEvents.PopBackStack)
+        }
+    }
+
+    fun onNavigateToSearchCode() {
+        viewModelScope.launch {
+            _appEvents.send(AppEvents.Navigating("search_code_screen"))
+        }
+    }
 }

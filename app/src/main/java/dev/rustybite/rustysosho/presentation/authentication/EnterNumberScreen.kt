@@ -61,17 +61,3 @@ fun EnterNumberScreen(
         scrollState = scrollState
     )
 }
-
-
-@Composable
-fun SuccessScreen(
-    modifier: Modifier = Modifier,
-    uiState: AuthUiState
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
-        Text(text = uiState.successMessage)
-    }
-}
