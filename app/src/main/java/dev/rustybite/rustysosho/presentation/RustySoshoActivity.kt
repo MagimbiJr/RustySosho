@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,8 +22,12 @@ class RustySoshoActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val navHostController = rememberNavController()
+            val scrollState = rememberScrollState()
             RustySoshoTheme {
-                RustySoshoNavHost(navHostController = navHostController)
+                RustySoshoNavHost(
+                    navHostController = navHostController,
+                    scrollState = scrollState
+                )
             }
         }
     }

@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.rustybite.rustysosho.domain.model.User
 import dev.rustybite.rustysosho.domain.use_cases.AuthenticateUseCase
 import dev.rustybite.rustysosho.domain.use_cases.VerifyNumberUseCase
 import dev.rustybite.rustysosho.util.AppEvents
+import dev.rustybite.rustysosho.util.BottomNavItem
 import dev.rustybite.rustysosho.util.Resource
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +27,10 @@ class AuthViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
     private val _appEvents = Channel<AppEvents>()
     val appEvents = _appEvents.receiveAsFlow()
+    private var user = User()
 
+
+    
     fun authenticate(phoneNumber: String) {
         viewModelScope.launch {
             val data = JsonObject()
@@ -54,7 +59,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun verifyNumber(otp: String, phoneNumber: String) {
+    fun verifyNumber(otp: String, phoneNumber: String, homeRoute: String) {
         viewModelScope.launch {
             val data = JsonObject()
             data.addProperty("type", "sms")
@@ -64,7 +69,27 @@ class AuthViewModel @Inject constructor(
             verifyNumberUseCase(data).collectLatest { response ->
                 when(response) {
                     is Resource.Success -> {
-
+                        if (response.data != null) {
+                            user = User(
+                                userId = response.data.user.id,
+                                phoneNumber = response.data.user.phone,
+                                createdAt = response.data.user.createdAt,
+                                lastSignInAt = response.data.user.lastSignInAt,
+                                updatedAt = response.data.user.updatedAt,
+                            )
+                            if (user.name.isNotBlank()) {
+                                _appEvents.send(AppEvents.Navigating(homeRoute))
+                                _uiState.value = _uiState.value.copy(
+                                    isUserStored = true
+                                )
+                            } else {
+                                _appEvents.send(AppEvents.Navigating("registration_screen"))
+                                _uiState.value = _uiState.value.copy(
+                                    isUserStored = false
+                                )
+                                //response.data.
+                            }
+                        }
                     }
                     is Resource.Failure -> {
                         _uiState.value = _uiState.value.copy(
@@ -78,6 +103,35 @@ class AuthViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun onPhoneChange(phoneNumber: String) {
+        _uiState.value = _uiState.value.copy(
+            phoneNumber = phoneNumber
+        )
+    }
+    fun onOtpChange(otp: String) {
+        _uiState.value = _uiState.value.copy(
+            otp = otp
+        )
+    }
+
+    fun onQueryChange(query: String) {
+        _uiState.value = _uiState.value.copy(
+            query = query
+        )
+    }
+
+    fun onCountryCodeChange(code: String) {
+        _uiState.value = _uiState.value.copy(
+            countryCode = code
+        )
+    }
+
+    fun onNavigateToCodeSelection() {
+        viewModelScope.launch {
+            _appEvents.send(AppEvents.Navigating("code_selection_screen"))
         }
     }
 }

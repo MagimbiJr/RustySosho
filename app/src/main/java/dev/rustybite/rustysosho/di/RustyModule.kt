@@ -29,7 +29,7 @@ object RustyModule {
 
     @Singleton
     @Provides
-    fun provideAuthRepository(service: RustySoshoService): AuthRepositoryImpl {
+    fun provideAuthRepository(service: RustySoshoService): AuthRepository {
         return AuthRepositoryImpl(service)
     }
 

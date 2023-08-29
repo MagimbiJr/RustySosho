@@ -5,6 +5,7 @@ import dev.rustybite.rustysosho.data.dto.auth.AuthResponseDto
 import dev.rustybite.rustysosho.data.dto.auth.VerifiedResponseDto
 import dev.rustybite.rustysosho.util.RustyConstants
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 
@@ -20,4 +21,8 @@ interface RustySoshoService {
     suspend fun verifyNumber(
         @Body data: JsonObject
     ): VerifiedResponseDto
+
+    @GET("rest/v1/users")
+    @Headers("apiKey: ${RustyConstants.API_KEY}, Authorization: Bearer ${RustyConstants.API_KEY}")
+    suspend fun getUsers()
 }

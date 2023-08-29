@@ -1,5 +1,6 @@
 package dev.rustybite.rustysosho.presentation
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -11,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import dev.rustybite.rustysosho.R
+import dev.rustybite.rustysosho.presentation.authentication.EnterNumberScreen
 import dev.rustybite.rustysosho.presentation.ui.components.RSBottomNavBar
 import dev.rustybite.rustysosho.util.BottomNavItem
 
@@ -18,7 +20,8 @@ import dev.rustybite.rustysosho.util.BottomNavItem
 @Composable
 fun RustySoshoNavHost(
     navHostController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    scrollState: ScrollState
 ) {
     val home = BottomNavItem.Home(stringResource(id = R.string.home_screen_name))
     val charts = BottomNavItem.Charts(stringResource(id = R.string.charts_screen_name))
@@ -32,6 +35,7 @@ fun RustySoshoNavHost(
     )
     val curBackStackEntry = navHostController.currentBackStackEntryAsState().value
     val currentRoute = curBackStackEntry?.destination?.route
+    //val startActivity = if ()
     Scaffold(
         bottomBar = {
             RSBottomNavBar(
@@ -52,7 +56,7 @@ fun RustySoshoNavHost(
 
         NavHost(
             navController = navHostController,
-            startDestination = home.route,
+            startDestination = "enter_phone_screen",
             modifier = modifier
                 .padding(paddingValues)
             ) {
@@ -67,6 +71,9 @@ fun RustySoshoNavHost(
             }
             composable(profile.route) {
 
+            }
+            composable("enter_phone_screen") {
+                EnterNumberScreen(onNavigate = {}, scrollState = scrollState)
             }
         }
 
