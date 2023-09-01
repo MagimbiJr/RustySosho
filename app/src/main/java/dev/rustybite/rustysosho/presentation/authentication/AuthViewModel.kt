@@ -1,5 +1,6 @@
 package dev.rustybite.rustysosho.presentation.authentication
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
@@ -8,8 +9,9 @@ import dev.rustybite.rustysosho.domain.model.User
 import dev.rustybite.rustysosho.domain.use_cases.AuthenticateUseCase
 import dev.rustybite.rustysosho.domain.use_cases.VerifyNumberUseCase
 import dev.rustybite.rustysosho.util.AppEvents
-import dev.rustybite.rustysosho.util.BottomNavItem
 import dev.rustybite.rustysosho.util.Resource
+import dev.rustybite.rustysosho.util.RustyConstants
+import dev.rustybite.rustysosho.util.codes
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,13 +32,12 @@ class AuthViewModel @Inject constructor(
     private var user = User()
 
 
-    
     fun authenticate(phoneNumber: String) {
         viewModelScope.launch {
             val data = JsonObject()
             data.addProperty("phone", phoneNumber)
             authenticateUseCase(data).collectLatest { response ->
-                when(response) {
+                when (response) {
                     is Resource.Success -> {
                         if (response.data != null) {
                             if (response.data.messageId.isNotBlank()) {
@@ -44,11 +45,13 @@ class AuthViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is Resource.Failure -> {
                         _uiState.value = _uiState.value.copy(
                             errorMessage = response.message ?: ""
                         )
                     }
+
                     is Resource.Loading -> {
                         _uiState.value = _uiState.value.copy(
                             loading = true
@@ -67,7 +70,7 @@ class AuthViewModel @Inject constructor(
             data.addProperty("token", otp)
 
             verifyNumberUseCase(data).collectLatest { response ->
-                when(response) {
+                when (response) {
                     is Resource.Success -> {
                         if (response.data != null) {
                             user = User(
@@ -91,11 +94,13 @@ class AuthViewModel @Inject constructor(
                             }
                         }
                     }
+
                     is Resource.Failure -> {
                         _uiState.value = _uiState.value.copy(
                             errorMessage = response.message ?: ""
                         )
                     }
+
                     is Resource.Loading -> {
                         _uiState.value = _uiState.value.copy(
                             loading = true
@@ -111,6 +116,7 @@ class AuthViewModel @Inject constructor(
             phoneNumber = phoneNumber
         )
     }
+
     fun onOtpChange(otp: String) {
         _uiState.value = _uiState.value.copy(
             otp = otp
@@ -121,6 +127,10 @@ class AuthViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(
             query = query
         )
+        val result = codes.filter { code ->
+            code.name.lowercase().contains(query)
+        }
+        _uiState.value = _uiState.value.copy(searchResult = result)
     }
 
     fun onCountryCodeChange(code: String) {
@@ -144,6 +154,19 @@ class AuthViewModel @Inject constructor(
     fun onNavigateToSearchCode() {
         viewModelScope.launch {
             _appEvents.send(AppEvents.Navigating("search_code_screen"))
+        }
+    }
+
+    fun onPopBackFromSearchCode() {
+        viewModelScope.launch {
+            _appEvents.send(AppEvents.PopBackStack)
+        }
+    }
+
+    fun onNavigateToVerifyNumber() {
+        viewModelScope.launch {
+            _appEvents.send(AppEvents.Navigating("verify_number_screen"))
+            _uiState.value = _uiState.value.copy(query = "")
         }
     }
 }

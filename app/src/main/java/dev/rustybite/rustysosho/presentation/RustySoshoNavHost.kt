@@ -2,17 +2,23 @@ package dev.rustybite.rustysosho.presentation
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import dev.rustybite.rustysosho.R
+import dev.rustybite.rustysosho.presentation.authentication.AuthViewModel
 import dev.rustybite.rustysosho.presentation.authentication.EnterNumberScreen
+import dev.rustybite.rustysosho.presentation.authentication.SearchCountryCodeScreen
 import dev.rustybite.rustysosho.presentation.authentication.SelectCountryCodeScreen
 import dev.rustybite.rustysosho.presentation.ui.components.RSBottomNavBar
 import dev.rustybite.rustysosho.util.BottomNavItem
@@ -20,9 +26,10 @@ import dev.rustybite.rustysosho.util.BottomNavItem
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RustySoshoNavHost(
-    navHostController: NavHostController,
     modifier: Modifier = Modifier,
-    scrollState: ScrollState
+    navHostController: NavHostController = rememberNavController(),
+    scrollState: ScrollState = rememberScrollState(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val home = BottomNavItem.Home(stringResource(id = R.string.home_screen_name))
     val charts = BottomNavItem.Charts(stringResource(id = R.string.charts_screen_name))
@@ -57,7 +64,7 @@ fun RustySoshoNavHost(
 
         NavHost(
             navController = navHostController,
-            startDestination = "enter_phone_screen",
+            startDestination = "verify_number_screen",
             modifier = modifier
                 .padding(paddingValues)
         ) {
@@ -73,7 +80,7 @@ fun RustySoshoNavHost(
             composable(profile.route) {
 
             }
-            composable("enter_phone_screen") {
+            composable("verify_number_screen") {
                 EnterNumberScreen(
                     onNavigate = { event ->
                         navHostController.navigate(event.route) {
@@ -84,7 +91,8 @@ fun RustySoshoNavHost(
                             restoreState = true
                         }
                     },
-                    scrollState = scrollState
+                    scrollState = scrollState,
+                    viewModel = authViewModel
                 )
             }
             composable("code_selection_screen") {
@@ -98,11 +106,24 @@ fun RustySoshoNavHost(
                             restoreState = true
                         }
                     },
-                    onPopBackClicked = { navHostController.popBackStack() }
+                    onPopBackClicked = { navHostController.popBackStack() },
+                    viewModel = authViewModel
                 )
             }
             composable("search_code_screen") {
-
+                SearchCountryCodeScreen(
+                    onNavigate = { event ->
+                        navHostController.navigate(event.route) {
+                            popUpTo(navHostController.graph.findStartDestination().id)
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onPopBackClicked = {
+                        navHostController.popBackStack()
+                    },
+                    viewModel = authViewModel
+                )
             }
         }
 

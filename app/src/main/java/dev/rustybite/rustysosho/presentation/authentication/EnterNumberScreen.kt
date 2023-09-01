@@ -1,14 +1,12 @@
 package dev.rustybite.rustysosho.presentation.authentication
 
+import android.widget.Toast
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.rustybite.rustysosho.util.AppEvents
@@ -18,15 +16,16 @@ import kotlinx.coroutines.flow.collectLatest
 fun EnterNumberScreen(
     onNavigate: (AppEvents.Navigating) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AuthViewModel = hiltViewModel(),
     //systemUiController: SystemUiController,
-    scrollState: ScrollState
+    scrollState: ScrollState,
+    viewModel: AuthViewModel,
 ) {
     //systemUiController.setSystemBarsColor(MaterialTheme.colorScheme.background)
 
     val uiState = viewModel.uiState.collectAsState().value
     val focusManager = LocalFocusManager.current
     val appEvents = viewModel.appEvents
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = appEvents) {
         appEvents.collectLatest { event ->
@@ -36,7 +35,9 @@ fun EnterNumberScreen(
                 }
 
                 is AppEvents.ShowSnackBar -> Unit
-                is AppEvents.ShowToast -> Unit
+                is AppEvents.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                }
                 is AppEvents.PopBackStack -> Unit
                 is AppEvents.SignInRequired -> Unit
             }
