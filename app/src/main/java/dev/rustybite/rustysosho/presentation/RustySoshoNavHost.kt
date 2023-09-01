@@ -1,10 +1,12 @@
 package dev.rustybite.rustysosho.presentation
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -20,6 +22,7 @@ import dev.rustybite.rustysosho.presentation.authentication.AuthViewModel
 import dev.rustybite.rustysosho.presentation.authentication.EnterNumberScreen
 import dev.rustybite.rustysosho.presentation.authentication.SearchCountryCodeScreen
 import dev.rustybite.rustysosho.presentation.authentication.SelectCountryCodeScreen
+import dev.rustybite.rustysosho.presentation.authentication.VerifyOtpScreen
 import dev.rustybite.rustysosho.presentation.ui.components.RSBottomNavBar
 import dev.rustybite.rustysosho.util.BottomNavItem
 
@@ -124,6 +127,29 @@ fun RustySoshoNavHost(
                     },
                     viewModel = authViewModel
                 )
+            }
+            composable("verify_otp_screen") {
+                VerifyOtpScreen(
+                    onNavigate = { event ->
+                        navHostController.navigate(event.route) {
+                            navHostController.navigate(event.route) {
+                                popUpTo(event.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    },
+                    viewModel = authViewModel,
+                    scrollState = scrollState,
+                    route = home.route
+                )
+            } 
+            composable("registration_screen") {
+                Column {
+                    Text(text = "Register user")
+                }
             }
         }
 

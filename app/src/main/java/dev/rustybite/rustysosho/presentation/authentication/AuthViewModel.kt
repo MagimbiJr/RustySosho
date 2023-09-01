@@ -30,6 +30,7 @@ class AuthViewModel @Inject constructor(
     private val _appEvents = Channel<AppEvents>()
     val appEvents = _appEvents.receiveAsFlow()
     private var user = User()
+    private val phoneNumber = MutableStateFlow("")
 
 
     fun authenticate(phoneNumber: String) {
@@ -40,15 +41,20 @@ class AuthViewModel @Inject constructor(
                 when (response) {
                     is Resource.Success -> {
                         if (response.data != null) {
-                            if (response.data.messageId.isNotBlank()) {
-                                _appEvents.send(AppEvents.Navigating("verify_number_screen"))
+                            if (response.data.messageId != null) {
+                                _appEvents.send(AppEvents.Navigating("verify_otp_screen"))
                             }
                         }
+                        _uiState.value = _uiState.value.copy(
+                            loading = false
+                        )
+                        this@AuthViewModel.phoneNumber.value = phoneNumber
                     }
 
                     is Resource.Failure -> {
                         _uiState.value = _uiState.value.copy(
-                            errorMessage = response.message ?: ""
+                            errorMessage = response.message ?: "",
+                            loading = false
                         )
                     }
 
@@ -62,12 +68,15 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun verifyNumber(otp: String, phoneNumber: String, homeRoute: String) {
+    fun verifyNumber(otp: String, route: String) {
         viewModelScope.launch {
             val data = JsonObject()
             data.addProperty("type", "sms")
-            data.addProperty("phone", phoneNumber)
+            data.addProperty("phone", phoneNumber.value)
             data.addProperty("token", otp)
+
+            Log.d(RustyConstants.TAG, "authenticate: Headers is $data")
+            Log.d(RustyConstants.TAG, "authenticate: key is ${RustyConstants.API_KEY}")
 
             verifyNumberUseCase(data).collectLatest { response ->
                 when (response) {
@@ -81,14 +90,16 @@ class AuthViewModel @Inject constructor(
                                 updatedAt = response.data.user.updatedAt,
                             )
                             if (user.name.isNotBlank()) {
-                                _appEvents.send(AppEvents.Navigating(homeRoute))
+                                _appEvents.send(AppEvents.Navigating(route))
                                 _uiState.value = _uiState.value.copy(
-                                    isUserStored = true
+                                    isUserStored = true,
+                                    loading = false
                                 )
                             } else {
                                 _appEvents.send(AppEvents.Navigating("registration_screen"))
                                 _uiState.value = _uiState.value.copy(
-                                    isUserStored = false
+                                    isUserStored = false,
+                                    loading = false
                                 )
                                 //response.data.
                             }
@@ -97,7 +108,8 @@ class AuthViewModel @Inject constructor(
 
                     is Resource.Failure -> {
                         _uiState.value = _uiState.value.copy(
-                            errorMessage = response.message ?: ""
+                            errorMessage = response.message ?: "",
+                            loading = false
                         )
                     }
 
