@@ -8,4 +8,6 @@ interface AuthRepository {
     suspend fun authenticate(data: JsonObject): AuthResponseDto
 
     suspend fun verifyNumber(data: JsonObject): VerifiedResponseDto
+
+    suspend fun refreshToken(data: JsonObject): VerifiedResponseDto
 }

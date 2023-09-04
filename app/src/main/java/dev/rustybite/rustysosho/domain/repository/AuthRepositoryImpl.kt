@@ -17,4 +17,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun verifyNumber(data: JsonObject): VerifiedResponseDto {
         return service.verifyNumber(data)
     }
+
+    override suspend fun refreshToken(data: JsonObject): VerifiedResponseDto {
+        return service.refreshToken(data)
+    }
 }

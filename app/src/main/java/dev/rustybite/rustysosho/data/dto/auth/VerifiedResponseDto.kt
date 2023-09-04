@@ -8,9 +8,9 @@ data class VerifiedResponseDto(
     @SerializedName("access_token")
     val accessToken: String,
     @SerializedName("expires_at")
-    val expiresAt: Int,
+    val expiresAt: Long,
     @SerializedName("expires_in")
-    val expiresIn: Int,
+    val expiresIn: Long,
     @SerializedName("refresh_token")
     val refreshToken: String,
     @SerializedName("token_type")

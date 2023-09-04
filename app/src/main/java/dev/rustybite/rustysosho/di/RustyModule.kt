@@ -1,9 +1,12 @@
 package dev.rustybite.rustysosho.di
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dev.rustybite.rustysosho.data.local.PreferenceManager
 import dev.rustybite.rustysosho.data.remote.RustySoshoService
 import dev.rustybite.rustysosho.data.repository.AuthRepository
 import dev.rustybite.rustysosho.domain.repository.AuthRepositoryImpl
@@ -43,5 +46,11 @@ object RustyModule {
     @Provides
     fun provideVerifyNumberUseCase(repository: AuthRepository): VerifyNumberUseCase {
         return VerifyNumberUseCase(repository)
+    }
+
+    @Singleton
+    @Provides
+    fun providePrefManager(@ApplicationContext context: Context): PreferenceManager {
+        return PreferenceManager(context)
     }
 }
