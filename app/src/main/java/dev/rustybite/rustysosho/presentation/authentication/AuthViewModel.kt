@@ -1,16 +1,18 @@
 package dev.rustybite.rustysosho.presentation.authentication
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.rustybite.rustysosho.R
+import dev.rustybite.rustysosho.data.local.PreferenceManager
 import dev.rustybite.rustysosho.domain.model.User
 import dev.rustybite.rustysosho.domain.use_cases.AuthenticateUseCase
 import dev.rustybite.rustysosho.domain.use_cases.VerifyNumberUseCase
 import dev.rustybite.rustysosho.util.AppEvents
+import dev.rustybite.rustysosho.util.BottomNavItem
 import dev.rustybite.rustysosho.util.Resource
-import dev.rustybite.rustysosho.util.RustyConstants
+import dev.rustybite.rustysosho.util.ResourceProvider
 import dev.rustybite.rustysosho.util.codes
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +25,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authenticateUseCase: AuthenticateUseCase,
-    private val verifyNumberUseCase: VerifyNumberUseCase
+    private val verifyNumberUseCase: VerifyNumberUseCase,
+    private val prefManager: PreferenceManager,
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState())
     val uiState = _uiState.asStateFlow()
@@ -31,6 +35,7 @@ class AuthViewModel @Inject constructor(
     val appEvents = _appEvents.receiveAsFlow()
     private var user = User()
     private val phoneNumber = MutableStateFlow("")
+    private val home = BottomNavItem.Home(resourceProvider.getStringResource(R.string.home_screen_name))
 
 
     fun authenticate(phoneNumber: String) {
@@ -75,13 +80,16 @@ class AuthViewModel @Inject constructor(
             data.addProperty("phone", phoneNumber.value)
             data.addProperty("token", otp)
 
-            Log.d(RustyConstants.TAG, "authenticate: Headers is $data")
-            Log.d(RustyConstants.TAG, "authenticate: key is ${RustyConstants.API_KEY}")
-
             verifyNumberUseCase(data).collectLatest { response ->
                 when (response) {
                     is Resource.Success -> {
                         if (response.data != null) {
+
+                            prefManager.storeIsTokenExpired(
+                                response.data.accessToken,
+                                response.data.expiresAt
+                            )
+                            prefManager.storeRefreshToken(response.data.refreshToken)
                             user = User(
                                 userId = response.data.user.id,
                                 phoneNumber = response.data.user.phone,

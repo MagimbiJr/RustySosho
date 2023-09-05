@@ -29,8 +29,9 @@ import dev.rustybite.rustysosho.util.BottomNavItem
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RustySoshoNavHost(
+    startDestination: String,
     modifier: Modifier = Modifier,
-    navHostController: NavHostController = rememberNavController(),
+    navHostController: NavHostController,
     scrollState: ScrollState = rememberScrollState(),
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
@@ -49,25 +50,27 @@ fun RustySoshoNavHost(
     //val startActivity = if ()
     Scaffold(
         bottomBar = {
-            RSBottomNavBar(
-                items = items,
-                onNavItemClicked = { route ->
-                    navHostController.navigate(route) {
-                        popUpTo(navHostController.graph.startDestinationId) {
-                            saveState = true
+            if (startDestination == home.route) {
+                RSBottomNavBar(
+                    items = items,
+                    onNavItemClicked = { route ->
+                        navHostController.navigate(route) {
+                            popUpTo(navHostController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                currentRoute = currentRoute
-            )
+                    },
+                    currentRoute = currentRoute
+                )
+            }
         }
     ) { paddingValues ->
 
         NavHost(
             navController = navHostController,
-            startDestination = "verify_number_screen",
+            startDestination = startDestination,
             modifier = modifier
                 .padding(paddingValues)
         ) {

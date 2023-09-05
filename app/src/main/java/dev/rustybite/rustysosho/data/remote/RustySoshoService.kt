@@ -25,4 +25,10 @@ interface RustySoshoService {
     @GET("rest/v1/users")
     @Headers("apiKey: ${RustyConstants.API_KEY}, Authorization: Bearer ${RustyConstants.API_KEY}")
     suspend fun getUsers()
+
+    @POST("auth/v1/token?grant_type=refresh_token")
+    @Headers("apikey: ${RustyConstants.API_KEY}")
+    suspend fun refreshToken(
+        @Body data: JsonObject
+    ): VerifiedResponseDto
 }

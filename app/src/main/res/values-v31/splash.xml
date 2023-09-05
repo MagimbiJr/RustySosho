@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Splash" parent="Theme.RustySosho.SplashScreen">
+        <item name="windowSplashScreenIconBackgroundColor">#FBFCFF</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_rustysosho_logo</item>
+        <item name="windowSplashScreenAnimationDuration">800</item>
+        <item name="postSplashScreenTheme">@style/Theme.RustySosho</item>
+    </style>
+</resources>
